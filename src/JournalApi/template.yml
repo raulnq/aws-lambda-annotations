@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  NewsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+      TableName: newstable
+  JournalApiFunctionsRegisterNewsGenerated:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Tool: Amazon.Lambda.Annotations
+      SyncedEvents:
+        - RootPost
+    Properties:
+      Runtime: dotnet6
+      CodeUri: .
+      MemorySize: 512
+      Timeout: 30
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: newstable
+      PackageType: Zip
+      Handler: JournalApi::JournalApi.Functions_RegisterNews_Generated::RegisterNews
+      Events:
+        RootPost:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: POST
+  JournalApiFunctionsListNewsGenerated:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Tool: Amazon.Lambda.Annotations
+      SyncedEvents:
+        - RootGet
+    Properties:
+      Runtime: dotnet6
+      CodeUri: .
+      MemorySize: 512
+      Timeout: 30
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: newstable
+      PackageType: Zip
+      Handler: JournalApi::JournalApi.Functions_ListNews_Generated::ListNews
+      Events:
+        RootGet:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: GET
+  JournalApiFunctionsGetNewsGenerated:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Tool: Amazon.Lambda.Annotations
+      SyncedEvents:
+        - RootGet
+    Properties:
+      Runtime: dotnet6
+      CodeUri: .
+      MemorySize: 512
+      Timeout: 30
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: newstable
+      PackageType: Zip
+      Handler: JournalApi::JournalApi.Functions_GetNews_Generated::GetNews
+      Events:
+        RootGet:
+          Type: HttpApi
+          Properties:
+            Path: /{id}
+            Method: GET
